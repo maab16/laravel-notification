@@ -32,7 +32,7 @@ class UserNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail','database'];
     }
 
     /**
@@ -49,6 +49,19 @@ class UserNotification extends Notification
                     ->line('Please click the confirmation link to complete your registration.')
                     ->action('Cofirm Email', url(config('app.url')))
                     ->line('Thank you for using our application!');
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toDatabase($notifiable)
+    {
+        return [
+            'confirm_message' => "Account created successfully.Confirm Email."
+        ];
     }
 
     /**

@@ -44,6 +44,25 @@
                             <li><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
                             <li><a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a></li>
                         @else
+                           <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <button type="button" class="btn btn-primary" id="notification" data-user="{{ Auth::user()->id }}">
+                                      Notification <span class="badge badge-light" id="total_notification">{{count(Auth::user()->unreadNotifications)}}</span>
+                                    </button>
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <ul>
+                                        @foreach(Auth::user()->unreadNotifications as $notification)
+                                            <li class="unread_notification" style="background-color: #ddd">{{ $notification->data['confirm_message'] }}</li>
+                                        @endforeach
+                                        @foreach(Auth::user()->readNotifications as $notification)
+                                            <li>{{ $notification->data['confirm_message'] }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
@@ -71,5 +90,36 @@
             @yield('content')
         </main>
     </div>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
+    <script type="text/javascript">
+        {{-- var APP_URL = {!! json_encode(url(config('app.url'))) !!}; --}}
+        var APP_URL = {!! json_encode(url('/')) !!};
+        jQuery(document).ready(function($) {
+            $('#notification').on("click",function(e){
+                e.preventDefault();
+                
+                var id = $(this).data("user");
+                var response = $.ajax({
+                    url: APP_URL+'/notification/markAsRead/'+id,
+                    type: 'GET',
+                    dataType: 'json',
+                    async: false,
+                    data: {
+                        
+                    },
+                    success: function(data) {
+                       $('.unread_notification').css({
+                            backgroundColor: 'transparent'
+                        });
+                    }
+                }).responseText;
+                var obj = JSON.parse(response);
+   
+                $(this).find('#total_notification').html(obj.total);
+                
+            }); 
+        });
+</script>
 </body>
 </html>

@@ -14,6 +14,12 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/notification/markAsRead/{user}', function (App\User $user) {
+
+    $user->unreadNotifications->markAsRead();
+
+    echo json_encode(['total'=>0]);
+});
 
 Auth::routes();
 
